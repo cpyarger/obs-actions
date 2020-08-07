@@ -13,7 +13,7 @@
 #include <utility>
 #include "obs-action.h"
 #include "forms/obs-actions-widget.hpp"
-
+#include "obs-controller.hpp"
 #include <QtWidgets/QAction>
 #include <QtWidgets/QMainWindow>
 #include <QIcon>
@@ -44,6 +44,7 @@ bool obs_module_load(void)
 	char *path = obs_module_file("midi.svg");
 	blog(LOG_INFO, "MIDI LOADED ");
 	register_gui(path);
+	Controller *controller = new Controller();
 	return true;
 }
 void obs_module_unload()

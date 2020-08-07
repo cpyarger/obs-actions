@@ -31,6 +31,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include <vector>
 #include <map>
 #include <functional>
+#include <mapper.hpp>
 using namespace std;
 
 ////////////////////
@@ -40,9 +41,9 @@ using namespace std;
 /**
  * Sets the currently active scene
  */
-void OBSController::SetCurrentScene(const char *sceneName)
+void OBSController::SetCurrentScene(obs_data_t* data)
 {
-	OBSSourceAutoRelease source = obs_get_source_by_name(sceneName);
+	OBSSourceAutoRelease source = obs_get_source_by_name(obs_data_get_string(data, "scene"));
 
 	if (source) {
 		obs_frontend_set_current_scene(source);
@@ -399,14 +400,18 @@ void OBSController::SetGainFilter() {}
 
 void OBSController::SetOpacity() {}
 
-Controller::Controller() {}
+Controller::Controller()
+{
+	ControlMapper *mapper = (ControlMapper *)obs_frontend_get_mapper();
+	connect(mapper, SIGNAL(DoAction(obs_data_t *)), this,
+		SLOT(execute(obs_data_t *)));
+}
 Controller::~Controller() {}
 // BUTTON ACTIONS
 std::map<QString, function<void(obs_data_t *)>> funcMap = {
 	{"control.action.Set_Current_Scene",
 	 [](obs_data_t *data) {
-		 OBSController::SetCurrentScene(
-			 obs_data_get_string(data, "scene"));
+		 OBSController::SetCurrentScene(data);
 	 }},
 	{"control.action.Set_Preview_Scene",
 	 [](obs_data_t *data) {
@@ -529,8 +534,9 @@ QString Controller::TranslateActions(obs_data_t *data)
 void Controller::execute(obs_data_t *data)
 {
 	try {
-
+		blog(1, "do action %s", tr(obs_data_get_string(data, "action")).toStdString().c_str());
 		funcMap[QString(obs_data_get_string(data, "action"))](data);
+		
 	} catch (...) {
 		blog(1, "Error Executing");
 	}

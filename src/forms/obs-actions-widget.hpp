@@ -14,9 +14,7 @@
 #include <obs.hpp>
 #include "ui_OBSActionsWidget.h"
 #include <QtWidgets/qwidget.h>
-namespace Ui {
-class OBSActionsWidget;
-}
+
 
 class OBSActionsWidget : public QWidget {
 	Q_OBJECT

@@ -18,12 +18,19 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #pragma once
 
 #include <iostream>
-#include "qobject.h"
+#include <QObject>
 #include "utils.hpp"
-
+#include <functional>
+#include <QWidget>
+#include <QPointer>
+#include <QDoubleSpinBox>
+#include <QStackedWidget>
+#include <vector>
+#include <map>
+#include <functional>
 namespace OBSController {
 // BUTTON ACTIONS
-void SetCurrentScene(const char *sceneName);
+void SetCurrentScene(obs_data_t* data);
 void SetPreviewScene(const char *sceneName);
 void SetCurrentSceneCollection(const char *sceneCollection);
 void ResetSceneItem(const char *sceneName, const char *itemName);
@@ -72,7 +79,7 @@ void SetSourceScale();
 void SetGainFilter();
 void SetOpacity();
 };
-
+using namespace std;
 class Controller : public QObject {
 	Q_OBJECT
 
@@ -80,6 +87,7 @@ public:
 	Controller();
 	~Controller();
 	QString TranslateActions(obs_data_t *actionData);
+	map < const char *, function<void(obs_data_t *)>> functionmap;
 public slots:
 	void execute(obs_data_t *data);
 };
