@@ -403,7 +403,7 @@ void OBSController::SetOpacity() {}
 Controller::Controller()
 {
 	ControlMapper *mapper = (ControlMapper *)obs_frontend_get_mapper();
-	connect(mapper, SIGNAL(DoAction(obs_data_t *)), this,
+	connect(mapper, SIGNAL(do_action(obs_data_t *)), this,
 		SLOT(execute(obs_data_t *)));
 }
 Controller::~Controller() {}
