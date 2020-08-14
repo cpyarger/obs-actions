@@ -146,6 +146,7 @@ private:
 	void ShowHideAdvanced(bool state);
 public slots:
 	bool MapCall(QString plugin, obs_data_t *map);
+
 private slots:
 	QStringList GetSources(QString scene);
 	void obs_actions_filter_select(int);
@@ -153,14 +154,13 @@ private slots:
 	QStringList GetTransitions();
 	void obs_actions_select(QString action);
 	void check_advanced_switch(bool state);
-
-	void EditAction(QString ActionType, obs_data_t *TriggerType);
+	void edit_action(obs_data_t *TriggerType);
 	void ResetToDefaults();
 	void onChange();
 	void on_source_change(QString source);
 	void on_scene_change(QString source);
 signals:
-	void changed(QString type, obs_data_t *change);
+	void changed(obs_data_t *change);
 
 private:
 	Ui::OBSActionsWidget *ui;

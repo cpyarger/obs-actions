@@ -27,14 +27,9 @@ OBS_MODULE_USE_DEFAULT_LOCALE("obs-midi", "en-US")
 
 void register_gui(char *path)
 {
-
-	//SettingsDialog *cont = new SettingsDialog(sw);
 	QWidget *cont = new OBSActionsWidget();
-
 	QIcon *ic = new QIcon(path);
 	QString *na = new QString("OBS");
-	//obs_frontend_add_control_window(icon, name, settingsDialog);
-
 	obs_frontend_add_output_control(na, cont);
 	bfree(path);
 }
@@ -42,7 +37,7 @@ void register_gui(char *path)
 bool obs_module_load(void)
 {
 	char *path = obs_module_file("midi.svg");
-	blog(LOG_INFO, "MIDI LOADED ");
+	blog(LOG_INFO, "OBS Actions Module Loaded!");
 	register_gui(path);
 	Controller *controller = new Controller();
 	return true;
