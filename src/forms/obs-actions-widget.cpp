@@ -41,8 +41,7 @@ OBSActionsWidget::OBSActionsWidget() : ui(new Ui::OBSActionsWidget)
 	ui->cb_obs_output_transition->addItems(Utils::GetTransitionsList());
 	ControlMapper *map = (ControlMapper*)obs_frontend_get_mapper();
 	TranslateActions();
-	connect(map, SIGNAL(EditAction(QString, obs_data_t *)), this,
-		SLOT(EditAction(QString, obs_data_t *)));
+	
 	connect(ui->cb_obs_action, SIGNAL(currentIndexChanged(int)), this,
 		SLOT(obs_actions_filter_select(int)));
 	connect(ui->cb_obs_output_scene, SIGNAL(currentTextChanged(QString)),
@@ -53,39 +52,39 @@ OBSActionsWidget::OBSActionsWidget() : ui(new Ui::OBSActionsWidget)
 		this, SLOT(GetSources(QString)));
 	connect(ui->cb_obs_output_source, SIGNAL(currentTextChanged(QString)),
 		this, SLOT(GetFilters(QString)));
-	connect(ui->check_advanced, SIGNAL(toggled(bool)), this,
-		SLOT(check_advanced_switch(bool)));
+	connect(ui->check_advanced,
+		SIGNAL(toggled(bool)), this, SLOT(check_advanced_switch(bool)));
 
 	//connect all combos to on change
-	connect(ui->cb_obs_output_action, SIGNAL(currentTextChanged(QString)),
-		this, SLOT(onChange()));
-	connect(ui->cb_obs_output_source, SIGNAL(currentTextChanged(QString)),
-		this, SLOT(onChange()));
-	connect(ui->cb_obs_output_source, SIGNAL(currentTextChanged(QString)),
-		this, SLOT(on_source_change(QString)));
-	connect(ui->cb_obs_output_scene, SIGNAL(currentTextChanged(QString)),
-		this, SLOT(on_scene_change(QString)));
-	connect(ui->cb_obs_output_scene, SIGNAL(currentTextChanged(QString)),
-		this, SLOT(onChange()));
-	connect(ui->cb_obs_output_item, SIGNAL(currentTextChanged(QString)),
-		this, SLOT(onChange()));
-	connect(ui->cb_obs_output_filter, SIGNAL(currentTextChanged(QString)),
-		this, SLOT(onChange()));
-
-
+	connect(ui->cb_obs_output_action,
+		SIGNAL(currentTextChanged(QString)), this, SLOT(onChange()));
+	connect(ui->cb_obs_output_source,
+		SIGNAL(currentTextChanged(QString)), this, SLOT(onChange()));
+	connect(ui->cb_obs_output_source,
+		SIGNAL(currentTextChanged(QString)), this, SLOT(on_source_change(QString)));
+	connect(ui->cb_obs_output_scene,
+		SIGNAL(currentTextChanged(QString)), this, SLOT(on_scene_change(QString)));
+	connect(ui->cb_obs_output_scene,
+		SIGNAL(currentTextChanged(QString)), this, SLOT(onChange()));
+	connect(ui->cb_obs_output_item,
+		SIGNAL(currentTextChanged(QString)), this, SLOT(onChange()));
+	connect(ui->cb_obs_output_filter,
+		SIGNAL(currentTextChanged(QString)), this, SLOT(onChange()));
 	connect(ui->cb_obs_output_transition,
 		SIGNAL(currentTextChanged(QString)), this, SLOT(onChange()));
 	connect(ui->cb_obs_output_audio_source,
 		SIGNAL(currentTextChanged(QString)), this, SLOT(onChange()));
 	connect(ui->cb_obs_output_media_source,
 		SIGNAL(currentTextChanged(QString)), this, SLOT(onChange()));
-	connect(map, SIGNAL(ResetToDefaults()), this, SLOT(ResetToDefaults()));
-	connect(this, SIGNAL(changed(QString, obs_data_t *)), map,
-		SLOT(UpdateAction(QString, obs_data_t *)));
 
+	/**************Connections to mappper****************/
+	connect(map, SIGNAL(edit_action(obs_data_t *)), this,
+		SLOT(edit_action(obs_data_t *)));
 
-
-
+	connect(map, SIGNAL(reset_to_defaults()), this,
+		SLOT(ResetToDefaults()));
+	connect(this, SIGNAL(changed(obs_data_t *)), map,
+		SLOT(update_action(obs_data_t *)));
 	setStyleSheet("QComboBox { min-width: 60px; }"
 		      "QComboBox QAbstractItemView { min-height: 100px;}");
 	this->listview = new QListView(this->ui->cb_obs_output_action);
@@ -402,16 +401,16 @@ void OBSActionsWidget::obs_actions_filter_select(int selection)
 	switching = false;
 }
 
-void OBSActionsWidget::EditAction(QString type, obs_data_t *actions)
+void OBSActionsWidget::edit_action( obs_data_t *actions)
 {
-	if (type == "OBS") {
+	if (QString(obs_data_get_string(actions, "Type")) == QString("OBS")) {
 		ui->cb_obs_output_action->setCurrentText(
 			tr(obs_data_get_string(actions, "action")));
 		ui->cb_obs_output_scene->setCurrentText(
 			QString(obs_data_get_string(actions, "scene")));
 		ui->cb_obs_output_audio_source->setCurrentText(
 			QString(obs_data_get_string(actions, "audio_source")));
-		blog(1, "EditAction-- widget -- %s",
+		blog(1, "edit_action-- widget -- %s",
 		     obs_data_get_string(actions, "action"));
 	}
 }
@@ -450,7 +449,7 @@ void OBSActionsWidget::onChange()
 				    .toStdString()
 				    .c_str());
 	obs_data_set_string(data, "Type", "OBS");
-	emit(changed("OBS", data));
+	emit(changed(data));
 	//obs_data_release(data);
 }
 
